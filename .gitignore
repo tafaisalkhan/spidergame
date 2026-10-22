@@ -1,0 +1,43 @@
+# User exclusions: no assets, no json, no keystore files
+assets/
+**/*.json
+*.json
+*.keystore
+*.jks
+*.p12
+*.pem
+*key.properties*
+
+# Asset binaries (images, audio, fonts)
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.svg
+*.wav
+*.mp3
+*.ogg
+*.ttf
+*.otf
+
+# Godot engine cache & imports
+.godot/
+.import/
+*.import
+
+# Build artifacts & Gradle caches
+*.apk
+*.aab
+*.idsig
+*.log
+.gradle/
+.ad-compile/
+**/build/
+android/.gradle/
+android/build/
+android/app/build/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.tmp
