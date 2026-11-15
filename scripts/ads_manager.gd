@@ -5,6 +5,7 @@ signal reward_granted(amount: int)
 signal ad_load_failed(format: String, reason: String)
 
 const TEST_IDS := "res://config/admob_test.cfg"
+const SECRET_IDS := "res://admob_secrets.cfg"
 const REWARDED_COINS := 5
 
 var plugin: Object
@@ -30,7 +31,8 @@ var preview_rewarded := false
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var ids := ConfigFile.new()
-	if ids.load(TEST_IDS) != OK:
+	var cfg_path := SECRET_IDS if ResourceLoader.exists(SECRET_IDS) else TEST_IDS
+	if ids.load(cfg_path) != OK:
 		return
 	banner_id = str(ids.get_value("android", "banner_unit_id", ""))
 	interstitial_id = str(ids.get_value("android", "interstitial_unit_id", ""))
