@@ -45,3 +45,34 @@ android/
 .DS_Store
 Thumbs.db
 *.tmp
+
+# Play listing artwork and matching Android launcher icons
+!assets/
+assets/*
+!assets/branding/
+assets/branding/*
+!assets/branding/launcher_icon_192.png
+!assets/branding/launcher_adaptive_foreground_432.png
+!assets/branding/launcher_adaptive_background_432.png
+!assets/branding/store_icon_512x512.png
+
+# Daily reminder Android integration
+!android/
+android/*
+!android/build/
+android/build/*
+!android/build/src/
+android/build/src/*
+!android/build/src/main/
+android/build/src/main/*
+!android/build/src/main/AndroidManifest.xml
+!android/build/src/main/java/
+android/build/src/main/java/*
+!android/build/src/main/java/com/
+android/build/src/main/java/com/*
+!android/build/src/main/java/com/godot/
+android/build/src/main/java/com/godot/*
+!android/build/src/main/java/com/godot/game/
+android/build/src/main/java/com/godot/game/*
+!android/build/src/main/java/com/godot/game/daily/
+!android/build/src/main/java/com/godot/game/daily/SpiderDailyReminderPlugin.java

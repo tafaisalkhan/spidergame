@@ -15,6 +15,7 @@ var bugs_next_level := 1
 var rival_next_level := 1
 var rival_levels := false
 var bugs_mode := false
+var daily_mode := false
 
 func _ready() -> void:
 	load_progress()
@@ -105,7 +106,7 @@ func sync_from_campaign(balance: int, unlocks: Array[bool], style: int) -> void:
 	get_node("/root/SignalHub").spider_selected.emit(selected_style)
 
 func show_scene(path: String) -> void:
-	if path in ["res://scenes/main_menu.tscn", "res://scenes/shop.tscn", "res://scenes/settings.tscn"]:
+	if path in ["res://scenes/main_menu.tscn", "res://scenes/shop.tscn", "res://scenes/settings.tscn", "res://scenes/daily_challenge.tscn"]:
 		get_node("/root/AdsManager").show_banner()
 	else:
 		get_node("/root/AdsManager").hide_banner()
@@ -113,6 +114,9 @@ func show_scene(path: String) -> void:
 	get_tree().change_scene_to_file(path)
 
 func start_first_hunt(as_bugs := false) -> void:
+	daily_mode = false
+	if get_tree().has_meta("first_hunt_daily_mode"):
+		get_tree().remove_meta("first_hunt_daily_mode")
 	rival_levels = false
 	bugs_mode = as_bugs
 	current_level = bugs_next_level if as_bugs else 1
@@ -131,6 +135,9 @@ func start_bugs_mode() -> void:
 	start_first_hunt(true)
 
 func start_rival_levels() -> void:
+	daily_mode = false
+	if get_tree().has_meta("first_hunt_daily_mode"):
+		get_tree().remove_meta("first_hunt_daily_mode")
 	rival_levels = true
 	bugs_mode = false
 	current_level = rival_next_level
@@ -144,6 +151,22 @@ func start_rival_levels() -> void:
 		get_tree().remove_meta("first_hunt_bugs_mode")
 	show_scene("res://scenes/first_hunt.tscn")
 
+func start_daily_challenge() -> void:
+	var daily := get_node("/root/DailyChallenge")
+	if not daily.start_today():
+		return
+	daily_mode = true
+	rival_levels = daily.challenge_is_rival()
+	bugs_mode = not rival_levels
+	current_level = daily.challenge_level()
+	get_tree().set_meta("first_hunt_level", current_level)
+	get_tree().set_meta("first_hunt_rival_levels", rival_levels)
+	get_tree().set_meta("first_hunt_bugs_mode", bugs_mode)
+	get_tree().set_meta("first_hunt_daily_mode", true)
+	if get_tree().has_meta("first_hunt_spider_power"):
+		get_tree().remove_meta("first_hunt_spider_power")
+	show_scene("res://scenes/first_hunt.tscn")
+
 func advance_first_hunt(level: int, power: int) -> void:
 	current_level = maxi(1, level)
 	get_tree().set_meta("first_hunt_level", current_level)
@@ -154,7 +177,9 @@ func advance_first_hunt(level: int, power: int) -> void:
 
 func notify_level_completed(level: int, bug_count: int) -> void:
 	current_level = level
-	if bugs_mode:
+	if daily_mode:
+		get_node("/root/DailyChallenge").complete_active()
+	elif bugs_mode:
 		bugs_next_level = maxi(bugs_next_level, level + 1)
 	elif rival_levels:
 		rival_next_level = maxi(rival_next_level, level + 1)

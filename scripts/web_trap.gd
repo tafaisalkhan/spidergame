@@ -119,6 +119,7 @@ var extra_rivals: Array[RivalHunter] = []
 var solo_start_scale := SOLO_START_SCALE
 var rival_levels := false
 var bugs_mode := false
+var daily_mode := false
 var carried_trap_scale := 0.0
 var level_start_power := 0
 var player_power := 0
@@ -301,6 +302,9 @@ var rival_morsel: Sprite2D
 
 func _ready() -> void:
 	load_progress()
+	if intro_mode and get_tree().has_meta("first_hunt_daily_mode"):
+		daily_mode = bool(get_tree().get_meta("first_hunt_daily_mode"))
+		get_tree().remove_meta("first_hunt_daily_mode")
 	if intro_mode and get_tree().has_meta("first_hunt_rival_levels"):
 		rival_levels = bool(get_tree().get_meta("first_hunt_rival_levels"))
 		get_tree().remove_meta("first_hunt_rival_levels")
@@ -934,7 +938,7 @@ func build_scene() -> void:
 	style_result_action(retry_button)
 	retry_button.pressed.connect(restart)
 	result_panel.add_child(retry_button)
-	if intro_mode:
+	if intro_mode and not daily_mode:
 		next_button = Button.new()
 		next_button.name = "NextLevelButton"
 		next_button.text = ""
@@ -1156,7 +1160,7 @@ func toggle_bugs_pause() -> void:
 func return_to_main_menu() -> void:
 	bugs_paused = false
 	get_tree().paused = false
-	get_node("/root/GameManager").show_scene("res://scenes/main_menu.tscn")
+	get_node("/root/GameManager").show_scene("res://scenes/daily_challenge.tscn" if daily_mode else "res://scenes/main_menu.tscn")
 
 func _exit_tree() -> void:
 	if bugs_paused:
@@ -1458,6 +1462,9 @@ func advance_intro_level() -> void:
 	_finish_advance_intro_level()
 
 func _finish_advance_intro_level() -> void:
+	if daily_mode:
+		get_node("/root/GameManager").show_scene("res://scenes/daily_challenge.tscn")
+		return
 	get_node("/root/GameManager").advance_first_hunt(intro_level + 1, 0 if bugs_mode else player_power)
 
 func player_catch_radius() -> float:
@@ -4161,8 +4168,8 @@ func show_result_popup(success: bool) -> void:
 			star_tween.kill()
 	star_reveal_tweens.clear()
 	result_panel.texture = RESULT_VICTORY if success else RESULT_FAILURE
-	result_level.text = "LEVEL %d" % intro_level if intro_mode else "THE WEB TRAP"
-	result_title.text = ("LEVEL COMPLETE!" if success else ("LEVEL FAILED" if bugs_mode else "GAME OVER")) if intro_mode else ("YOU WIN!" if success else ("LEVEL FAILED" if winner == 2 else "DRAW!"))
+	result_level.text = "DAILY CHALLENGE" if daily_mode else ("LEVEL %d" % intro_level if intro_mode else "THE WEB TRAP")
+	result_title.text = ("DAILY COMPLETE!" if success else "DAILY FAILED!") if daily_mode else (("LEVEL COMPLETE!" if success else ("LEVEL FAILED" if bugs_mode else "GAME OVER")) if intro_mode else ("YOU WIN!" if success else ("LEVEL FAILED" if winner == 2 else "DRAW!")))
 	result_title.add_theme_color_override("font_color", Color(0.23, 0.34, 0.11) if success else Color(0.56, 0.13, 0.08))
 	result_reward.text = "+5 COINS" if success else "NO COINS"
 	result_note.text = ("Caught: %d / %d  Escaped: %d" % [caught_count, bugs_mode_bug_count(), escaped_count]) if bugs_mode else (("You: %d  Top rival: %d  Goal: %d" % [caught_count, highest_rival_bug_count(), intro_goal()]) if rival_count_battle() else (("Bug count: %d / %d" % [caught_count, intro_goal()]) if intro_mode else "You: %d   Rival: %d   Escaped: %d" % [caught_count, rival_caught_count, escaped_count]))
@@ -4181,9 +4188,9 @@ func show_result_popup(success: bool) -> void:
 			star_tween.parallel().tween_property(star, "modulate:a", 1.0, 0.25)
 			star_reveal_tweens.append(star_tween)
 	retry_button.visible = true
-	if intro_mode:
+	if intro_mode and next_button != null:
 		next_button.visible = success
-	var three_actions := intro_mode and next_button.visible
+	var three_actions := intro_mode and next_button != null and next_button.visible
 	retry_button.position = Vector2(185, 870) if three_actions else Vector2(285, 870)
 	result_menu_button.position = Vector2(565, 870) if three_actions else Vector2(465, 870)
 	result_dimmer.visible = true

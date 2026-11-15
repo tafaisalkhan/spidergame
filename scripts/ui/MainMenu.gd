@@ -9,13 +9,16 @@ func screen_title() -> String:
 	return "CHOOSE YOUR HUNT"
 
 func build_content() -> void:
-	var bugs_button := make_button("BUGS MODE", Vector2(990, 265), 128.0, PLAY_ICON)
+	var bugs_button := make_button("BUGS MODE", Vector2(990, 245), 116.0, PLAY_ICON)
 	bugs_button.name = "BugsModeButton"
 	bugs_button.pressed.connect(get_node("/root/GameManager").start_bugs_mode)
-	var rival_button := make_button("RIVAL MODE", Vector2(990, 420), 128.0, RIVAL_ICON)
+	var rival_button := make_button("RIVAL MODE", Vector2(990, 370), 116.0, RIVAL_ICON)
 	rival_button.name = "RivalLevelsButton"
 	rival_button.pressed.connect(get_node("/root/GameManager").start_rival_levels)
-	var store_button := make_button("STORE", Vector2(990, 575), 128.0, STORE_ICON)
+	var daily_button := make_button("DAILY CHALLENGE", Vector2(990, 495), 116.0, PLAY_ICON)
+	daily_button.name = "DailyChallengeButton"
+	daily_button.pressed.connect(open_scene.bind("res://scenes/daily_challenge.tscn"))
+	var store_button := make_button("STORE", Vector2(990, 620), 116.0, STORE_ICON)
 	store_button.name = "StoreButton"
 	store_button.pressed.connect(open_scene.bind("res://scenes/shop.tscn"))
 	var store_icon := TextureRect.new()
@@ -26,5 +29,5 @@ func build_content() -> void:
 	store_icon.size = Vector2(74, 74)
 	store_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	store_button.add_child(store_icon)
-	make_button("SETTINGS", Vector2(990, 730), 128.0, SETTINGS_ICON).pressed.connect(open_scene.bind("res://scenes/settings.tscn"))
-	status_label.text = "Hunt bugs or face rival spiders."
+	make_button("SETTINGS", Vector2(990, 745), 116.0, SETTINGS_ICON).pressed.connect(open_scene.bind("res://scenes/settings.tscn"))
+	status_label.text = "Hunt bugs, face rivals, or play today's challenge."
